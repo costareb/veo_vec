@@ -176,7 +176,7 @@ User feedback is stored automatically.
 
 ---
 
-## Limitations
+## Limitations and Outlook
 
 ### OCR
 
@@ -188,8 +188,12 @@ To avoid OCR costs during testing, this prototype includes a dummy OCR module th
 RAG is experimental. Large models such as mistral-nemo may time out during local inference.  
 Planned improvements:
 
-- Switch to smaller but strong models (e.g., xLSTM)  
+- Switch to smaller but strong models (e.g. xLSTM)  
 - Move inference to cloud resources for scalability  
+
+### Explicit filtering
+
+For a first evaluation the system is applied to venezuelan documents only. Once we upscale explicit filtering options shall be added (language, country, further metadata). 
 
 ---
 

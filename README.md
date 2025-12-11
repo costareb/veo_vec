@@ -2,7 +2,7 @@
 
 ## Motivation & Overview
 
-Veo Partners supports enterprises in their transition toward sustainability and ensures compliance with national and international environmental regulations. Their internal document collection contains thousands of legal PDFs, many of which are unstructured or low-quality scans. This makes searching the corpus difficult and inefficient.
+This project is being developed with and for a company that supports enterprises in their transition toward sustainability and ensures compliance with national and international environmental regulations. Their internal document collection contains thousands of legal PDFs, many of which are unstructured or low-quality scans. This makes searching the corpus difficult and inefficient.
 
 VeoVec is a local full-stack retrieval and semantic search system designed to index and query large collections of legal PDF documents. The quality of the search results is currently being evaluated by in-house legal experts.
 

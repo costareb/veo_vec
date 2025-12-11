@@ -1,0 +1,5 @@
+pdf_data/
+*.pdf
+__pycache__/
+*.pyc
+app_data/*.json

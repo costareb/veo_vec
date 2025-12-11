@@ -58,7 +58,7 @@ veo_vec/
 ├── app_data/                 # UI assets (license-free)
 ├── feedback_collector/       # User feedback logs
 └── pdf_data/                 # Mount point for PDFs/TXTs (empty here)
-
+```
 
 ---
 

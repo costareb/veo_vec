@@ -43,20 +43,21 @@ This repository functions as a research prototype and a portfolio project demons
 
 ## Project Structure
 
+```text
 veo_vec/
 │
-├── app.py # Main Streamlit application
-├── app_utils.py # Search, ingestion, RAG pipeline
-├── fake_OCR.py # Dummy OCR module
-├── sanity.py # OCR and ingestion validation
+├── app.py                    # Main Streamlit application
+├── app_utils.py              # Search, ingestion, RAG pipeline
+├── fake_OCR.py               # Dummy OCR module
+├── sanity.py                 # OCR and ingestion validation
 ├── Dockerfile
 ├── docker-compose.yml
 ├── entrypoint.sh
 ├── requirements.txt
 │
-├── app_data/ # UI assets (license-free)
-├── feedback_collector/ # User feedback logs
-└── pdf_data/ # Mount point for PDFs/TXTs (empty here)
+├── app_data/                 # UI assets (license-free)
+├── feedback_collector/       # User feedback logs
+└── pdf_data/                 # Mount point for PDFs/TXTs (empty here)
 
 
 ---

@@ -1,13 +1,18 @@
 
-from pathlib import Path
+
 import hashlib
 import weaviate
 from weaviate.classes.config import Configure, Property, DataType
 from weaviate.classes.query import MetadataQuery
 import uuid
 from PIL import Image
-from datetime import date
 from weaviate.classes.init import AdditionalConfig, Timeout
+from pathlib import Path
+import os, json
+import pandas as pd
+from datetime import datetime
+import streamlit as st
+from weaviate.classes.data import DataObject
 
 
 
@@ -91,13 +96,6 @@ def add_new_collection_to_feedback(d: dict, collection_name: str, pop_log, chunk
 ###########################################################################
 
 ############################### Populate a Collection #####################
-
-from pathlib import Path
-import os, json
-import pandas as pd
-from datetime import datetime
-import streamlit as st
-from weaviate.classes.data import DataObject
 
 # max words and overlaps are important hyperparameters may be crucial to tune
 def _chunk_text(text: str, max_words: int = 600, overlap: int = 100):

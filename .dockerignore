@@ -1,0 +1,8 @@
+pdf_data/
+__pycache__/
+*.pyc
+.git/
+.venv/
+venv/
+.env
+feedback_collector/population_log.json

@@ -1,0 +1,58 @@
+services:
+  weaviate:
+    image: cr.weaviate.io/semitechnologies/weaviate:1.33.0
+    command:
+      [
+        "--host", "0.0.0.0",
+        "--port", "8080",
+        "--scheme", "http",
+        "--read-timeout=600s", ########
+        "--write-timeout=600s" ############ increase timeouts 
+      ]
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+      - "50051:50051"
+    environment:
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: "true"
+      CLUSTER_HOSTNAME: "node1"
+      ENABLE_MODULES: "text2vec-ollama,generative-ollama"
+      PERSISTENCE_DATA_PATH: "/var/lib/weaviate"
+      QUERY_DEFAULTS_LIMIT: "25"
+      OLLAMA_URL: "http://ollama:11434"
+      GENERATIVE_OLLAMA_MODEL: "mistral-nemo"
+      TEXT2VEC_OLLAMA_MODEL: "nomic-embed-text"   ### right model 
+      MODULES_CLIENT_TIMEOUT: "600s"
+    volumes:
+      - weaviate_data:/var/lib/weaviate
+    depends_on:
+      - ollama
+
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      - weaviate
+    ports:
+      - "8501:8501"
+      - "8000:8000"
+    environment:
+      WEAVIATE_HOST: "weaviate"
+      OLLAMA_URL: "http://ollama:11434"
+    volumes:
+      - ./pdf_data:/app/pdf_data
+
+volumes:
+  weaviate_data:
+  ollama_data:
+
+
+#############

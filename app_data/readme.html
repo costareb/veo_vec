@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>How to Use This Prototype</title>
+  <style>
+    :root{
+      --bg: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --accent: #2563eb;
+      --accent-soft: #eff6ff;
+      --code-bg: #0b1020;
+      --code-text: #e5e7eb;
+    }
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      line-height:1.6;
+    }
+    .wrap{
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+    h1{
+      font-size: 1.9rem;
+      margin: 0 0 8px;
+      letter-spacing: 0.2px;
+    }
+    .subtitle{
+      color:var(--muted);
+      margin-bottom: 18px;
+    }
+    .note{
+      background: var(--accent-soft);
+      border:1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      padding: 12px 14px;
+      border-radius: 10px;
+      margin: 14px 0 22px;
+    }
+
+    /* FIX: disable automatic numbering */
+    ol{
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    ol > li{
+      margin: 12px 0 18px;
+      padding: 12px 12px 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+    }
+    ol > li > h2{
+      font-size: 1.2rem;
+      margin: 0 0 6px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .step-num{
+      font-weight: 700;
+      color: var(--accent);
+    }
+    ul, ol ol{
+      margin-top: 8px;
+    }
+    .small{
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    code, .inline-code{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      background:#f3f4f6;
+      border:1px solid var(--border);
+      padding: 0.06rem 0.33rem;
+      border-radius: 6px;
+      font-size: 0.95em;
+    }
+    .folder{
+      font-weight:600;
+    }
+    .divider{
+      height:1px;
+      background:var(--border);
+      margin: 18px 0;
+    }
+    .closing{
+      margin-top: 8px;
+      padding: 14px;
+      border:1px dashed var(--border);
+      border-radius: 12px;
+      color:#0f172a;
+      background:#fafafa;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>How to use this prototype</h1>
+    <div class="subtitle">
+      Quick guide to set up the app and start searching / running RAG.
+    </div>
+
+    <div class="note">
+      On your left you see 6 tabs. To set everything up, go through them from
+      <strong>right to left</strong>. The leftmost tabs will be the most relevant once everything is good to go.
+    </div>
+
+    <ol>
+      <li>
+        <h2><span class="step-num">1)</span> Preprocess PDFs 🛠️</h2>
+        <p>
+          Our PDFs come in unpredictably — as text, pictures, scans, etc.
+          The AI models need raw text. This is achieved by Optical Character Recognition (OCR)
+          using a Google service. Since this service is not free, it is not recommended to run it
+          multiple times for the same data.
+        </p>
+        <p>
+          Instead, I implemented a <em>fake-OCR function</em> that adds the preprocessed
+          <span class="inline-code">.txt</span> files to the data folder as if OCR had been performed.
+          How to do this:
+        </p>
+        <ol type="a">
+          <li>
+            Make sure to have the folder
+            <span class="folder">“2025-07-25_FAOLEX_Kolumbien_gesamt”</span>
+            inside a folder called <span class="folder">“pdf_data”</span>.
+            The <span class="folder">“pdf_data”</span> folder must be in the same folder as this
+            application (the same folder that also contains
+            <span class="inline-code">“app_data”</span> and
+            <span class="inline-code">“feedback_collector”</span>).
+          </li>
+          <li>
+            Select the tab <strong>“Preprocess PDFs”</strong> and hit <strong>“Run fake-OCR 🔥”</strong>.
+          </li>
+          <li>
+            Wait until done, then hit <strong>“Run sanity check 🚑”</strong>.
+          </li>
+        </ol>
+      </li>
+
+      <li>
+        <h2><span class="step-num">2)</span> Initialize a New Collection 📚</h2>
+        <p><strong>What is a collection?</strong></p>
+        <p>
+          Under the hood this app uses a database library called
+          <span class="inline-code">weaviate</span>. The data itself, however, is not stored there
+          but in the <span class="folder">pdf_data</span> folder.
+          What weaviate provides is that this data is read and encoded as a vector by an AI model,
+          which allows us to do various things. For example, we can enter a query (which is also
+          encoded as a vector) and display the documents with the smallest vector-distance to our
+          query as search results. These vectors are called <em>embeddings</em>.
+        </p>
+        <p>
+          It would be very easy to have one embedding per document. But this comes with a downside:
+          assume we have vectors with <em>n</em> entries (let’s say <em>n = 10</em>) and two documents:
+          <em>d1</em> with 10 words (tokens) and <em>d2</em> with 100 words. Then we could perfectly
+          represent <em>d1</em> with our n-vector (each word corresponds to a number). For <em>d2</em>,
+          however, we would lose much more information, because one number would need to represent
+          10 words.
+        </p>
+        <p>
+          This is where <strong>chunking</strong> comes into play. If we cut all documents into chunks
+          with a fixed chunk size and then embed the chunks as vectors, we keep the same relationship
+          between text length and vector size for each datapoint — nice!
+        </p>
+        <p>
+          To avoid losing information by cutting sentences in half, we also define a chunk overlap.
+          With chunk size 10 and overlap 5, in our example we would get 21 chunks out of <em>d1</em>
+          and <em>d2</em>. These chunks, together with all their metadata (which file and which vector
+          they belong to), are stored by weaviate. One set of chunks is called a <strong>Collection</strong>.
+        </p>
+	<p>
+        Note that chunk size influences also search and information retrieval: 
+	smaller chunks mean that we look at many small pieces of text. Too small would mean that we lose the context. 
+	Larger chunks mean more context in the embedding,
+	but also the risk of information loss. A traidoff has to be made, and the best way to find a good chunk size is experimentation. 
+	As an indication: Our vector embeddings consist of ~750 numbers. I would not choose chunk sizes above this value. 
+	You can also imagine chunk size as a receptive field or a zoom factor. 
+	</p>
+	<p>
+          Use the <strong>Collections</strong> tab to initialize a new collection by entering a name
+          and hitting <strong>“Initialize new 🚀”</strong>. You can use the same tab to remove one or all collections 🪚.
+	</p>
+	<p>
+	  As the chunk size influences how the search in this collection will work we can see chunksize as property of the collection and case you want to experiment with different chunk sizes and collections (recommended) it is good practice to embed the chunksize that you plan to use when populating the collection already in you collection name, calling your collection e.g. 'collection_cs350_ol75'. Because if this collection later gives good or bad results you can immediately see the parameters, the chunksize and overlap, that led to this success or failor, and decide whether to continue experimenting in this direction or goind somewhere else.  
+        </p>
+
+
+
+      </li>
+
+      <li>
+        <h2><span class="step-num">3)</span> Populate your Collection 🐝</h2>
+        <p>
+          Now that the collection is initialized, we can populate it with data.
+          As anticipated, we need to tell weaviate how to do this, we need to choose
+          chunk size and overlap.
+        </p>
+        <p>
+          There are default values implemented here. However, feel free to experiment with these
+          hyperparameters and see what works best. This step (hyperparameter tuning) is a crucial
+          part in any machine learning application and unfortunately there is no way around it.
+          If we are lucky, it will work well immediately; if we are unlucky… well, let’s hope we are lucky.
+        </p>
+        <p>
+          This step might take some time, as the whole text must be processed by the AI model. You can let it run over night. If it gets interrupted or if you interrupt it and restart later on, it will continue from where it stopped. Nothing will be lost nor overwritten, which also means: If you want to populate with different chunk size and overlap you need to make a new colleciton. 
+        </p>
+	<p>
+          It can happen that you face an error message here, which comes with further explanations about what to do in this case. Long story short: you can downscale batch size or restart with smaller chunk size and smaller batchsize. This problem has to do with your computer and hardware limitations. In this case there is no other way than adapting the experiments to said limitations, arm yourself with patience and make the best out of it until we switch to a cloud service with more compute power or stay local but downsacle everything (especially: Use simpler and smaller AI models). 
+        </p>
+      </li>
+
+      <li>
+        <h2><span class="step-num">4)</span> Now the setup is done and we can Search 🔎</h2>
+        <p>
+          Hit <strong>“Open search”</strong> in the Search tab to open the search screen.
+          In the settings to the left (inside the tab) you choose the collection you want to search.
+        </p>
+        <ul>
+          <li>
+            <strong>Semantic search</strong> performs a search based on semantic vector vicinity.
+          </li>
+          <li>
+            <strong>Hybrid search</strong> mixes this with a classic multilingual keyword search,
+            to a degree <em>alpha</em> defined by you.
+          </li>
+          <li>
+            <strong>Max results</strong> defines the maximum number of results to display.
+          </li>
+        </ul>
+        <p>
+          Once you are ready and entered a query, hit <strong>“Search”</strong>.
+          The results (the original PDF) can be opened in the browser by clicking on the link.
+          The relevant chunk is shown, as well as the similarity score (how well this chunk fits the query).
+        </p>
+      </li>
+
+      <li>
+        <h2><span class="step-num">5)</span> Retrieval-Augmented Generation ❓</h2>
+        <p>
+          We spoke about it, so I thought it would be fun to add a RAG engine in order to see how far we can get. It is based on two models:
+          one to embed the query and find relevant documents, and another to generate the textual answer
+          (details in the RAG tab).
+        </p>
+        <p>
+          Documents considered relevant are shown as in Search. Again, you can fine-tune the
+          information retrieval used for the answer between semantic/vector or multilingual keyword search.
+        </p>
+        <p>
+          This process is computationally heavy. For that reason, there is:
+        </p>
+        <ul>
+          <li>a maximum number of chunks to consider for answer generation,</li>
+          <li>a maximum time we want to wait for an answer (to avoid runs that take hours or days),</li>
+          <li>a slider to decide how many relevant files you want displayed on screen.</li>
+        </ul>
+        <p>
+          My advice is to keep the number of files/chunks to consider rather low. If you have a very powerful CPU
+          or a lot of time, you might want to experiment with higher numbers.
+        </p>
+        <p>
+          To maximize control, we have two prompts:
+        </p>
+        <ul>
+          <li>
+            The <strong>meta-prompt</strong> is seen only by the answer-generating model and tells it
+            what to do with the provided context.
+          </li>
+          <li>
+            The <strong>RAG prompt</strong> contains the actual task related to the context. It is seen
+            by the answer-generating model <em>and</em> by the search engine — it will be embedded and used for IR.
+          </li>
+        </ul>
+        <p>
+          Dummy example:
+        </p>
+        <ul>
+          <li><strong>Meta-prompt:</strong> “Summarize the provided content in clear English.”</li>
+          <li><strong>RAG prompt:</strong> “What species are particularly endangered by illegal farming?”</li>
+        </ul>
+        <p>
+          After each RAG query you will be asked to provide feedback. This might help us evaluate which settings
+          work best (especially chunk sizes, etc.).
+        </p>
+      </li>
+    </ol>
+
+    <div class="closing">
+      In case you have any questions, problems, or bugs, please feel free to contact me.
+      Otherwise, good luck and have fun experimenting!
+    </div>
+  </div>
+</body>
+</html>
